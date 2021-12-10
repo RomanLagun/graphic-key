@@ -1,0 +1,16 @@
+:host {
+	ion-content {
+		//overflow: hidden;
+		padding-top: 50px;
+	}
+
+	ion-input {
+		border: 1px solid black;
+		border-radius: 3px;
+		--padding-start: 20px;
+	}
+
+	ion-button {
+		width: 100%;
+	}
+}

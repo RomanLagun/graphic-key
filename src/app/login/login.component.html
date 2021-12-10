@@ -1,0 +1,25 @@
+<ion-content>
+	<ion-grid>
+<!--	<ion-grid *ngIf="loginForm">-->
+<!--		<form [formGroup]="loginForm">-->
+			<ion-row>
+				<ion-col size="12">
+					<ion-input autocomplete="off"
+							   placeholder="{{'Логин'}}" type="text">
+					</ion-input>
+				</ion-col>
+			</ion-row>
+			<ion-row>
+				<ion-col size="12">
+					<ion-input autocomplete="off"
+							   placeholder="{{'Пароль'}}"
+							   type="{{true ? 'text' : 'password'}}">
+					</ion-input>
+				</ion-col>
+			</ion-row>
+		<ion-row>
+			<ion-button (click)="loginAction()">{{'Login'}}</ion-button>
+		</ion-row>
+<!--		</form>-->
+	</ion-grid>
+</ion-content>
