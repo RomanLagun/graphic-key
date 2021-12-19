@@ -13,7 +13,7 @@ export class GraphicKeyAuthComponent implements OnInit {
 	constructor() {
 	}
 
-	ngOnInit(): void {
+	ngOnInit(): void {A
 		this.finger = new Finger({
 			id: 'passwordArea',
 			width: 300,
@@ -24,7 +24,17 @@ export class GraphicKeyAuthComponent implements OnInit {
 			errorColor: '#ff3030',
 			cols: 3,
 			rows: 3,
-		}, () => {});
+		}, (res: any) => {
+			console.log('######', res)
+
+			setTimeout(() => {
+				this.finger?.drawPath(res, true);
+				setTimeout(() => {
+					this.finger?.reset()
+				}, 300)
+			}, 300)
+
+		});
 	}
 
 }

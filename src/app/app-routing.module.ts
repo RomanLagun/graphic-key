@@ -13,7 +13,7 @@ const routes: Routes = [
 	},
 	{
 		path: PageRefConst.EMPTY.name,
-		redirectTo: PageRefConst.LOGIN.name,
+		redirectTo: PageRefConst.GRAPHIC_KEY_AUTH.name,
 		pathMatch: 'full'
 	},
 ];
