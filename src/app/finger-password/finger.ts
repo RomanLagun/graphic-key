@@ -1,5 +1,6 @@
 // finger password
 import { PointModel } from './point.model';
+import {calcL} from "../util/util";
 
 export class Finger {
 	private config: any;
@@ -61,7 +62,6 @@ export class Finger {
 		canvas.addEventListener('touchmove', this.onTouchMove.bind(this));
 		window.addEventListener('touchend', this.onTouchEnd.bind(this)); // to listen if user releases mouse/finger out of canvas
 		box?.appendChild(canvas);
-		console.log('!!!!!!!', box)
 		return canvas.getContext("2d")
 	}
 
@@ -142,7 +142,6 @@ export class Finger {
 
 	// start moving finger
 	onTouchStart (e: any) {
-		console.log('111111', e)
 		let index = this.points.findIndex((p: any) => calcL(e.offsetX, e.offsetY, p.x, p.y, p.r))
 		if (index > -1) {
 			this.path = [index + 1]
@@ -153,12 +152,12 @@ export class Finger {
 	}
 
 	// finger movement
-	onTouchMove (e: any) {
-		console.log('MOVE', e, this.start)
+	onTouchMove (e: TouchEvent) {
 		if (!this.start) {
 			return;
 		}
-		let index = this.points.findIndex((p: any) => calcL(e.offsetX, e.offsetY, p.x, p.y, p.r))
+		console.log('!!!!!', e.changedTouches[0], this.points)
+		let index = this.points.findIndex((p: any) => calcL(e.changedTouches[0].clientX, e.changedTouches[0].clientY, p.x, p.y, p.r))
 		console.log('MOVE', e, this.start, index, this.points[index])
 		if (index > -1 && !this.points[index].active) {
 			this.path.push(index + 1)
@@ -166,7 +165,7 @@ export class Finger {
 		this.ctx.clearRect(0, 0, this.config.width, this.config.height)
 		// redrawing
 		this.drawBG()
-		this.drawLine(e.offsetX, e.offsetY)
+		this.drawLine(e.changedTouches[0].clientX, e.changedTouches[0].clientY)
 		this.drawPath(this.path)
 		this.drawPoint()
 	}
@@ -259,13 +258,4 @@ export class Point {
 }
 
 
-// Вычислите расстояние между двумя точками, чтобы определить, находится ли точка a в круге b
-// ax Координата X точки a
-// ay Координата Y точки a
-// bx Координата x центра окружности b
-// by Координата y центра окружности b
-// br Радиус круга b
-// return Верно по кругу, иначе ложно
-function calcL (ax: number, ay: number, bx: number, by: number, br: number) {
-	return br > Math.sqrt( (ax - bx) * (ax - bx) + (ay - by) * (ay - by) )
-}
+
