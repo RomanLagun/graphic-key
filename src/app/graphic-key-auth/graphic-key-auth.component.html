@@ -9,7 +9,10 @@
 		<ion-row>
 			<ion-col size="12">
 				<div class="box">
-					<div id="passwordArea"></div>
+					<app-finger-password
+						[config]="config"
+						[correctPath]="correctPath">
+					</app-finger-password>
 				</div>
 			</ion-col>
 		</ion-row>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Finger } from '../finger-password/finger';
+import { InputFingerPasswordConfigModel } from '../finger-password/finger-password-config.model';
 
 @Component({
 	selector: 'app-graphic-key-auth',
@@ -7,33 +7,16 @@ import { Finger } from '../finger-password/finger';
 	styleUrls: ['./graphic-key-auth.component.scss']
 })
 export class GraphicKeyAuthComponent implements OnInit {
-
-	public finger: Finger | undefined;
+	public config: InputFingerPasswordConfigModel;
+	public correctPath: Array<number> = [3,2,5,8,9];
 
 	constructor() {
 	}
 
 	ngOnInit(): void {
-		this.finger = new Finger({
-			id: 'passwordArea',
+		this.config = {
 			width: 300,
 			height: 300,
-			bgColor: '#eee',
-			lineColor: '#0089FF',
-			lineSize: 5,
-			errorColor: '#ff3030',
-			cols: 3,
-			rows: 3,
-		}, (res: any) => {
-			setTimeout(() => {
-				this.finger?.drawPath(res, true);
-				this.finger?.drawPoint();
-				setTimeout(() => {
-					this.finger?.reset();
-				}, 600)
-			}, 0)
-
-		});
+		};
 	}
-
 }
