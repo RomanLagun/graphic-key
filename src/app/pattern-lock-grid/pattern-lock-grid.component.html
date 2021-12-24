@@ -1,0 +1,41 @@
+<svg #patternLockSvg [attr.width]="config.width" [attr.height]="config.height" xmlns="http://www.w3.org/2000/svg">
+	<g *ngIf="lines">
+		<ng-container *ngFor="let line of lines">
+			<line
+					[attr.x1]="line.beginX"
+					[attr.y1]="line.beginY"
+					[attr.x2]="line.endX"
+					[attr.y2]="line.endY"
+					[attr.stroke]="line.lineColor"
+					[attr.fill]="line.lineColor"
+					[attr.stroke-width]="line.lineSize">
+			</line>
+		</ng-container>
+	</g>
+
+	<ng-container *ngIf="currentControlPositionLine">
+		<line [attr.x1]="currentControlPositionLine.beginX"
+			  [attr.y1]="currentControlPositionLine.beginY"
+			  [attr.x2]="currentControlPositionLine.endX"
+			  [attr.y2]="currentControlPositionLine.endY"
+			  [attr.stroke]="currentControlPositionLine.lineColor"
+			  [attr.fill]="currentControlPositionLine.lineColor"
+			  [attr.stroke-width]="currentControlPositionLine.lineSize">
+		</line>
+	</ng-container>
+
+	<g *ngIf="points">
+		<ng-container *ngFor="let point of points">
+			<ellipse *ngFor="let point of points"
+					 [attr.rx]="point.r"
+					 [attr.ry]="point.r"
+					 [attr.cx]="point.x"
+					 [attr.cy]="point.y"
+					 [attr.stroke]="point.error ? point.errorColor : point.lineColor"
+					 [attr.fill]="point.error ? point.errorColor : point.lineColor"
+					 [attr.stroke-width]="point.lineSize">
+			</ellipse>
+		</ng-container>
+	</g>
+</svg>
+
