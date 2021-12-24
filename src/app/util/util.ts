@@ -21,3 +21,14 @@ export function getTouchEventTargetCoordinates(event: TouchEvent): CoordinatesMo
 		left: event.changedTouches[0].clientX - elementRect.left,
 	}
 }
+
+/**
+ * Переводит координаты клика относительно экрана в координаты относительно target
+ */
+export function getMouseEventTargetCoordinates(event: MouseEvent): CoordinatesModel {
+	const elementRect = (<HTMLElement>event.target).getBoundingClientRect();
+	return {
+		top: event.clientY - elementRect.top,
+		left: event.clientX - elementRect.left,
+	}
+}

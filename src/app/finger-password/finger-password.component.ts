@@ -2,7 +2,7 @@ import { AfterViewInit, Component, EventEmitter, Inject, Input, OnDestroy, OnIni
 import { FingerPasswordConfigModel, InputFingerPasswordConfigModel } from './finger-password-config.model';
 import { PointModel } from './point.model';
 import { CoordinatesModel } from './coordinates.model';
-import { calcL, getTouchEventTargetCoordinates } from '../util/util';
+import { calcL, getMouseEventTargetCoordinates, getTouchEventTargetCoordinates } from '../util/util';
 import { DOCUMENT } from '@angular/common';
 import { DEFAULT_CONFIG_CONST } from './default-config.const';
 import { asyncScheduler } from 'rxjs';
@@ -42,6 +42,10 @@ export class FingerPasswordComponent implements OnInit, AfterViewInit, OnDestroy
 	private touchStartUnsubscribe: Function;
 	private touchMoveUnsubscribe: Function;
 	private touchEndUnsubscribe: Function;
+
+	private mouseDownUnsubscribe: Function;
+	private mouseMoveUnsubscribe: Function;
+	private mouseUpUnsubscribe: Function;
 	//-------------------------------------------------
 
 	constructor(private renderer: Renderer2, @Inject(DOCUMENT) private document: Document) {
@@ -97,7 +101,11 @@ export class FingerPasswordComponent implements OnInit, AfterViewInit, OnDestroy
 		// listeners
 		this.touchStartUnsubscribe = this.renderer.listen(canvas, 'touchstart', this.onTouchStart.bind(this));
 		this.touchMoveUnsubscribe = this.renderer.listen(canvas, 'touchmove', this.onTouchMove.bind(this));
-		this.touchEndUnsubscribe = this.renderer.listen(canvas, 'touchend', this.onTouchEnd.bind(this));
+		this.touchEndUnsubscribe = this.renderer.listen(window, 'touchend', this.onTouchEnd.bind(this));
+
+		this.mouseDownUnsubscribe = this.renderer.listen(canvas, 'mousedown', this.onMouseDown.bind(this));
+		this.mouseMoveUnsubscribe = this.renderer.listen(canvas, 'mousemove', this.onMouseMove.bind(this));
+		this.mouseUpUnsubscribe = this.renderer.listen(window, 'mouseup', this.onMouseUp.bind(this));
 
 		box?.appendChild(canvas);
 		return canvas.getContext("2d");
@@ -144,9 +152,54 @@ export class FingerPasswordComponent implements OnInit, AfterViewInit, OnDestroy
 	/**
 	 * First finger touch handler
 	 */
-	onTouchStart(e: TouchEvent): void {
+	private onTouchStart(e: TouchEvent): void {
 		const targetCoords: CoordinatesModel = getTouchEventTargetCoordinates(e);
 
+		this.startControlMovement(targetCoords);
+	}
+
+	/**
+	 * Finger movement handler
+	 */
+	private onTouchMove(e: TouchEvent): void {
+		const targetCoords: CoordinatesModel = getTouchEventTargetCoordinates(e);
+
+		this.moveControl(targetCoords);
+	}
+
+	/**
+	 * Finger removing from screen handler
+	 */
+	private onTouchEnd(): void {
+		this.endControlMovement();
+	}
+
+	/** endregion */
+
+	/** region Mouse events */
+	private onMouseDown(e: MouseEvent): void {
+		const targetCoords: CoordinatesModel = getMouseEventTargetCoordinates(e);
+
+		this.startControlMovement(targetCoords);
+	}
+
+	private onMouseMove(e: MouseEvent): void {
+		const targetCoords: CoordinatesModel = getMouseEventTargetCoordinates(e);
+
+		this.moveControl(targetCoords);
+	}
+
+	private onMouseUp(): void {
+		this.endControlMovement();
+	}
+	/** endregion */
+
+	/** region Event handlers common logic */
+
+	/**
+	 * Handle path drawing start
+	 */
+	private startControlMovement(targetCoords: CoordinatesModel): void {
 		let index = this.points.findIndex((p: any) => calcL(targetCoords.left, targetCoords.top, p.x, p.y, p.r));
 		if (index > -1) {
 			this.path = [index + 1];
@@ -157,14 +210,12 @@ export class FingerPasswordComponent implements OnInit, AfterViewInit, OnDestroy
 	}
 
 	/**
-	 * Finger movement handler
+	 * Handle path drawing
 	 */
-	onTouchMove(e: TouchEvent): void {
+	private moveControl(targetCoords: CoordinatesModel): void {
 		if (!this.start) {
 			return;
 		}
-
-		const targetCoords: CoordinatesModel = getTouchEventTargetCoordinates(e);
 
 		let index = this.points.findIndex((p: any) => calcL(targetCoords.left, targetCoords.top, p.x, p.y, p.r));
 		if (index > -1 && !this.points[index].active) {
@@ -183,9 +234,9 @@ export class FingerPasswordComponent implements OnInit, AfterViewInit, OnDestroy
 	}
 
 	/**
-	 * Finger removing from screen handler
+	 * Handle end path drawing
 	 */
-	onTouchEnd(): void {
+	private endControlMovement(): void {
 		if (this.start) {
 			if (!this.correctPath || this.checkPath(this.path)) {
 				this.successPasswordEntered.emit(this.path);
@@ -320,7 +371,8 @@ export class FingerPasswordComponent implements OnInit, AfterViewInit, OnDestroy
 	}
 
 	/**
-	 * Checks if points were skipped and fill them
+	 * Checks if points were skipped and fill them.
+	 * Cases by diagonal direction
 	 */
 	checkAndFillSkippedPoints(prev: number, current: number): any {
 		const cols: number = this.config.columns;
