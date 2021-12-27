@@ -19,6 +19,7 @@ export class FingerPasswordComponent implements OnInit, AfterViewInit, OnDestroy
 	@Input() correctPath: Array<number>; // path to compare with entered to show error
 	@Input() errorShowInterval: number = 500; // time in milliseconds to show error state
 	@Input() set config(value: InputFingerPasswordConfigModel) {
+		// ToDo - repaint canvas when config changes
 		this._config = {
 			...this._config,
 			...value,
@@ -98,11 +99,11 @@ export class FingerPasswordComponent implements OnInit, AfterViewInit, OnDestroy
 		let canvas = this.document.createElement('canvas');
 		canvas.width = this.config.width;
 		canvas.height = this.config.height;
+
 		// listeners
 		this.touchStartUnsubscribe = this.renderer.listen(canvas, 'touchstart', this.onTouchStart.bind(this));
 		this.touchMoveUnsubscribe = this.renderer.listen(canvas, 'touchmove', this.onTouchMove.bind(this));
 		this.touchEndUnsubscribe = this.renderer.listen(window, 'touchend', this.onTouchEnd.bind(this));
-
 		this.mouseDownUnsubscribe = this.renderer.listen(canvas, 'mousedown', this.onMouseDown.bind(this));
 		this.mouseMoveUnsubscribe = this.renderer.listen(canvas, 'mousemove', this.onMouseMove.bind(this));
 		this.mouseUpUnsubscribe = this.renderer.listen(window, 'mouseup', this.onMouseUp.bind(this));

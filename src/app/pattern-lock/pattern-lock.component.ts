@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnInit } from '@angular/core';
-import { Vibration } from '@awesome-cordova-plugins/vibration/ngx';
-import { InputPatternLockGridConfigModel } from '@sc-genbank-mob/features/pattern-lock-grid/model/pattern-lock-grid-config.model';
+// import { Vibration } from '@awesome-cordova-plugins/vibration/ngx';
+import {InputPatternLockGridConfigModel} from "../pattern-lock-grid/model/pattern-lock-grid-config.model";
 
 @Component({
 	selector: 'sc-ion-pattern-lock',
@@ -10,7 +10,7 @@ import { InputPatternLockGridConfigModel } from '@sc-genbank-mob/features/patter
 export class PatternLockComponent implements OnInit, AfterViewInit {
 	public config: InputPatternLockGridConfigModel;
 
-	constructor(private vibration: Vibration, private element: ElementRef) {
+	constructor(private element: ElementRef) {
 	}
 
 	ngOnInit() {
@@ -27,6 +27,6 @@ export class PatternLockComponent implements OnInit, AfterViewInit {
 	}
 
 	pointToPathAdded(): void {
-		this.vibration.vibrate(100);
+		// this.vibration.vibrate(100);
 	}
 }

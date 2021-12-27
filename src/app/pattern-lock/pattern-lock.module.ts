@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PatternLockComponent } from '@sc-genbank-mob/features/pattern-lock/pattern-lock.component';
-import { PatternLockGridModule } from '@sc-genbank-mob/features/pattern-lock-grid/pattern-lock-grid.module';
+import {PatternLockComponent} from "./pattern-lock.component";
+import {PatternLockGridModule} from "../pattern-lock-grid/pattern-lock-grid.module";
 
 @NgModule({
 	declarations: [PatternLockComponent],

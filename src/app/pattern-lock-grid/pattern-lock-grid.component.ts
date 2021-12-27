@@ -1,13 +1,25 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, Renderer2, ViewChild } from '@angular/core';
-import { PatternLockGridConfigModel, InputPatternLockGridConfigModel } from './model/pattern-lock-grid-config.model';
-import { PointModel } from './model/point.model';
-import { CoordinatesModel } from './model/coordinates.model';
-import { DOCUMENT } from '@angular/common';
-import { DEFAULT_CONFIG_CONST } from './default-config.const';
-import { asyncScheduler, fromEvent } from 'rxjs';
-import { calcL, getMouseEventTargetCoordinates, getTouchEventTargetCoordinates } from '@sc-genbank-mob/features/pattern-lock-grid/util';
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { LineModel } from '@sc-genbank-mob/features/pattern-lock-grid/model/line.model';
+import {
+	AfterViewInit,
+	ChangeDetectorRef,
+	Component,
+	ElementRef,
+	EventEmitter,
+	Inject,
+	Input,
+	OnInit,
+	Output,
+	Renderer2,
+	ViewChild
+} from '@angular/core';
+import {InputPatternLockGridConfigModel, PatternLockGridConfigModel} from './model/pattern-lock-grid-config.model';
+import {PointModel} from './model/point.model';
+import {CoordinatesModel} from './model/coordinates.model';
+import {DOCUMENT} from '@angular/common';
+import {DEFAULT_CONFIG_CONST} from './default-config.const';
+import {fromEvent} from 'rxjs';
+import {UntilDestroy, untilDestroyed} from '@ngneat/until-destroy';
+import {LineModel} from "./model/line.model";
+import {calcL, getMouseEventTargetCoordinates, getTouchEventTargetCoordinates} from "./util";
 
 @UntilDestroy()
 @Component({
@@ -16,8 +28,8 @@ import { LineModel } from '@sc-genbank-mob/features/pattern-lock-grid/model/line
 	styleUrls: ['./pattern-lock-grid.component.scss']
 })
 export class PatternLockGridComponent implements OnInit, AfterViewInit {
-	private readonly CANVAS_PARENT_ID: string = 'passwordArea';
 	private _config: PatternLockGridConfigModel;
+	private pointDetectionAreaMultiplier: number = 3;
 
 	@Input() correctPath: Array<number>; // path to compare with entered to show error
 	@Input() errorShowInterval: number = 500; // time in milliseconds to show error state
@@ -69,6 +81,7 @@ export class PatternLockGridComponent implements OnInit, AfterViewInit {
 		this.points = this.initPoints();
 		this.path = [];
 		this.lines = [];
+		// @ts-ignore
 		this.currentControlPositionLine = undefined;
 
 		this.subscribeDOMEvents();
@@ -86,6 +99,7 @@ export class PatternLockGridComponent implements OnInit, AfterViewInit {
 		this.start = false;
 		this.path = [];
 		this.lines = [];
+		// @ts-ignore
 		this.currentControlPositionLine = undefined;
 		this.cdr.detectChanges();
 	}
@@ -96,25 +110,21 @@ export class PatternLockGridComponent implements OnInit, AfterViewInit {
 	private subscribeDOMEvents(): void {
 		const svgElement = this.patternLockSvg.nativeElement;
 
-		fromEvent(svgElement, 'touchstart')
-			.pipe(untilDestroyed(this))
-			.subscribe((event: TouchEvent) => this.onTouchStart(event));
+		// @ts-ignore
+		fromEvent(svgElement, 'touchstart').pipe(untilDestroyed(this)).subscribe((event: TouchEvent) => this.onTouchStart(event));
 
-		fromEvent(svgElement, 'touchmove')
-			.pipe(untilDestroyed(this))
-			.subscribe((event: TouchEvent) => this.onTouchMove(event));
+		// @ts-ignore
+		fromEvent(svgElement, 'touchmove').pipe(untilDestroyed(this)).subscribe((event: TouchEvent) => this.onTouchMove(event));
 
 		fromEvent(window, 'touchend')
 			.pipe(untilDestroyed(this))
 			.subscribe(_ => this.onTouchEnd());
 
-		fromEvent(svgElement, 'mousedown')
-			.pipe(untilDestroyed(this))
-			.subscribe((event: MouseEvent) => this.onMouseDown(event));
+		// @ts-ignore
+		fromEvent(svgElement, 'mousedown').pipe(untilDestroyed(this)).subscribe((event: MouseEvent) => this.onMouseDown(event));
 
-		fromEvent(svgElement, 'mousemove')
-			.pipe(untilDestroyed(this))
-			.subscribe((event: MouseEvent) => this.onMouseMove(event));
+		// @ts-ignore
+		fromEvent(svgElement, 'mousemove').pipe(untilDestroyed(this)).subscribe((event: MouseEvent) => this.onMouseMove(event));
 
 		fromEvent(window, 'mouseup')
 			.pipe(untilDestroyed(this))
@@ -173,6 +183,7 @@ export class PatternLockGridComponent implements OnInit, AfterViewInit {
 	 * Finger movement handler
 	 */
 	private onTouchMove(e: TouchEvent): void {
+		e?.stopPropagation();
 		const targetCoords: CoordinatesModel = getTouchEventTargetCoordinates(e, this.patternLockSvg.nativeElement);
 
 		this.moveControl(targetCoords);
@@ -194,7 +205,8 @@ export class PatternLockGridComponent implements OnInit, AfterViewInit {
 		this.startControlMovement(targetCoords);
 	}
 
-	private onMouseMove(e: MouseEvent): void {
+	private onMouseMove(e: MouseEvent) {
+		e?.stopPropagation();
 		const targetCoords: CoordinatesModel = getMouseEventTargetCoordinates(e);
 
 		this.moveControl(targetCoords);
@@ -212,7 +224,7 @@ export class PatternLockGridComponent implements OnInit, AfterViewInit {
 	 * Handle path drawing start
 	 */
 	private startControlMovement(targetCoords: CoordinatesModel): void {
-		let index = this.points.findIndex((p: any) => calcL(targetCoords.left, targetCoords.top, p.x, p.y, p.r));
+		let index = this.points.findIndex((p: any) => calcL(targetCoords.left, targetCoords.top, p.x, p.y, p.r * this.pointDetectionAreaMultiplier));
 		if (index > -1) {
 			this.path = [index + 1];
 			this.updatePointsStatus(this.path)
@@ -228,7 +240,7 @@ export class PatternLockGridComponent implements OnInit, AfterViewInit {
 			return;
 		}
 
-		let index = this.points.findIndex((p: any) => calcL(targetCoords.left, targetCoords.top, p.x, p.y, p.r));
+		let index = this.points.findIndex((p: any) => calcL(targetCoords.left, targetCoords.top, p.x, p.y, p.r * this.pointDetectionAreaMultiplier));
 		if (index > -1 && !this.points[index].active) {
 			if (this.path.length > 0) {
 				this.checkAndFillSkippedPoints(this.path[this.path.length - 1] - 1, index);

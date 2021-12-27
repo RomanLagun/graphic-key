@@ -6,13 +6,31 @@
 			</ion-col>
 		</ion-row>
 
-		<ion-row>
+		<ion-segment (ionChange)="changeType($event)" [ngModel]="type">
+			<ion-segment-button value="CANVAS">
+				<ion-label>Canvas</ion-label>
+			</ion-segment-button>
+			<ion-segment-button value="SVG">
+				<ion-label>SVG</ion-label>
+			</ion-segment-button>
+		</ion-segment>
+
+		<ion-row *ngIf="type == 'CANVAS'">
 			<ion-col size="12">
 				<div class="box">
 					<app-finger-password
 						[config]="config"
 						[correctPath]="correctPath">
 					</app-finger-password>
+				</div>
+			</ion-col>
+		</ion-row>
+
+		<ion-row *ngIf="type == 'SVG'">
+			<ion-col size="12">
+				<div class="box">
+					<sc-ion-pattern-lock>
+					</sc-ion-pattern-lock>
 				</div>
 			</ion-col>
 		</ion-row>
