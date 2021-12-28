@@ -273,7 +273,7 @@ export class PatternLockGridComponent implements OnInit, AfterViewInit {
 				this.drawResult(errorPath, true);
 				setTimeout(() => {
 					this.reset();
-				}, this.errorShowInterval)
+				}, this.errorShowInterval);
 			}
 		}
 	}
